@@ -9,7 +9,8 @@ import java.util.Map;
 
 @RestController
 public class ProxyController {
-
+//Funciona
+//Nombre qliao 
     @Value("${auth.service.url}")
     private String authUrl;
 
