@@ -10,6 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -18,12 +19,14 @@ public class JwtFilter extends OncePerRequestFilter {
     private String secret;
 
     // Rutas que NO necesitan token
-    private static final String[] RUTAS_PUBLICAS = {
+    private static final List<String> RUTAS_PUBLICAS = List.of(
         "/api/auth/registro",
-        "/api/auth/login"
-    };
+        "/api/auth/login",
+        "/"
+    );
 
-    @Override
+
+   @Override
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain chain)
@@ -31,18 +34,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = req.getRequestURI();
 
-        // Si es ruta publica, dejar pasar
-        for (String ruta : RUTAS_PUBLICAS) {
-            if (path.equals(ruta)) {
-                chain.doFilter(req, res);
-                return;
-            }
+        if (RUTAS_PUBLICAS.contains(path)) {
+            chain.doFilter(req, res);
+            return;
         }
 
         String authHeader = req.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             res.setStatus(401);
+            res.setContentType("application/json");
             res.getWriter().write("{\"error\":\"Token requerido\"}");
             return;
         }
@@ -59,12 +60,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 .parseClaimsJws(token)
                 .getBody();
 
-            // Pasar datos del usuario al header para los microservicios
+            // Inyectar datos del usuario para los microservicios
             req.setAttribute("userId", claims.get("id"));
             req.setAttribute("userRol", claims.get("rol"));
 
         } catch (JwtException e) {
             res.setStatus(401);
+            res.setContentType("application/json");
             res.getWriter().write("{\"error\":\"Token invalido o expirado\"}");
             return;
         }
