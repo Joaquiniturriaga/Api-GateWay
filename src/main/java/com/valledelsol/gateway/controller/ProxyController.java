@@ -18,7 +18,7 @@ public class ProxyController {
     @Value("${user.service.url}")
     private String userUrl;
 
-    @Value("{report.service.url}")
+    @Value("${report.service.url}")
     private String reportUrl;
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -46,7 +46,7 @@ public class ProxyController {
             );
 
         }catch (HttpClientErrorException e){
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString(null));
+            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         }
     }
 
