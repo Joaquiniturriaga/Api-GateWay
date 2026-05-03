@@ -26,7 +26,7 @@ public class ProxyController {
     @PostMapping("/api/auth/register")
     public ResponseEntity<?> registro(@RequestBody Map<String,Object> body) {
         try{
-            return restTemplate.postForEntity(authUrl + "/api/auth/registro", body ,Object.class);
+            return restTemplate.postForEntity(authUrl + "/api/auth/register", body ,Object.class);
 
         }catch(HttpClientErrorException e){
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
