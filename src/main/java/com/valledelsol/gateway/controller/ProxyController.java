@@ -23,7 +23,7 @@ public class ProxyController {
     private final RestTemplate restTemplate = new RestTemplate();
 
     // --- AUTH routes (publicas) ---
-    @PostMapping("/api/auth/registro")
+    @PostMapping("/api/auth/register")
     public ResponseEntity<?> registro(@RequestBody Map<String,Object> body) {
         try{
             return restTemplate.postForEntity(authUrl + "/api/auth/registro", body ,Object.class);
