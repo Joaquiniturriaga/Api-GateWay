@@ -24,9 +24,11 @@ public class ProxyController {
 
     // --- AUTH routes (publicas) ---
     @PostMapping("/api/auth/register")
-    public ResponseEntity<?> registro(@RequestBody Map<String,Object> body) {
+    public ResponseEntity<?> register(@RequestBody Map<String,Object> body) {
         try{
-            return restTemplate.postForEntity(authUrl + "/api/auth/register", body ,Object.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            return restTemplate.postForEntity(authUrl + "/api/auth/register", new HttpEntity<>(body,headers), Object.class);
 
         }catch(HttpClientErrorException e){
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -36,8 +38,11 @@ public class ProxyController {
     @PostMapping("/api/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String,Object> body) {
         try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
             return restTemplate.postForEntity(
-                authUrl + "/api/auth/login", body, Object.class
+                authUrl + "/api/auth/login", new HttpEntity<>(body, headers),
+                Object.class
             );
 
         }catch (HttpClientErrorException e){
