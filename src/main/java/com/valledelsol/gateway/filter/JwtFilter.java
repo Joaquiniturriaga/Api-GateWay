@@ -20,7 +20,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Rutas que NO necesitan token
     private static final List<String> RUTAS_PUBLICAS = List.of(
-        "/api/auth/registro",
+        "/api/auth/register",
         "/api/auth/login",
         "/"
     );
