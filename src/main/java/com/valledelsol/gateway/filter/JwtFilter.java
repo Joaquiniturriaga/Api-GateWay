@@ -62,7 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // Inyectar datos del usuario para los microservicios
             req.setAttribute("userId", claims.get("id"));
-            req.setAttribute("userRol", claims.get("rol"));
+            req.setAttribute("userRol", claims.get("role"));
 
         } catch (JwtException e) {
             res.setStatus(401);
