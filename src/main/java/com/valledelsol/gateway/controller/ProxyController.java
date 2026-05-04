@@ -24,16 +24,23 @@ public class ProxyController {
 
     // --- AUTH routes (publicas) ---
     @PostMapping("/api/auth/register")
-    public ResponseEntity<?> register(@RequestBody Map<String,Object> body) {
-        try{
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            return restTemplate.postForEntity(authUrl + "/api/auth/register", new HttpEntity<>(body,headers), Object.class);
+public ResponseEntity<?> register(@RequestBody Map<String,Object> body) {
+    try {
+        System.out.println("Intentando llamar a: " + authUrl + "/api/auth/register"); // <-- Agregamos este log
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return restTemplate.postForEntity(authUrl + "/api/auth/register", new HttpEntity<>(body, headers), Object.class);
 
-        }catch(HttpClientErrorException e){
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
-        }
+    } catch (HttpClientErrorException e) {
+        return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+    } catch (Exception e) {
+        System.out.println("ERROR FATAL EN GATEWAY: " + e.getMessage());
+        e.printStackTrace(); // Esto fuerza que el error completo salga en los logs de Render
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body(Map.of("error_interno_gateway", e.getMessage()));
     }
+}
 
     @PostMapping("/api/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String,Object> body) {
