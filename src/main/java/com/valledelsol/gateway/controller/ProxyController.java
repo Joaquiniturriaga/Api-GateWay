@@ -1,4 +1,5 @@
 package com.valledelsol.gateway.controller;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,14 @@ public class ProxyController {
 
     @Value("${report.service.url}")
     private String reportUrl;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate(getClientConfig());
+
+    private static SimpleClientHttpRequestFactory getClientConfig() {
+    SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    factory.setConnectTimeout(60000); 
+    factory.setReadTimeout(60000);    
+    return factory;
+}
 
     // --- AUTH routes (publicas) ---
     @PostMapping("/api/auth/register")
