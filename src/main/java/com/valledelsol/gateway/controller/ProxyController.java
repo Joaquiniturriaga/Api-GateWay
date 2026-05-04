@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
-
+import org.springframework.web.client.HttpServerErrorException;
 
 @RestController
 public class ProxyController {
@@ -31,41 +31,57 @@ public class ProxyController {
 }
 
     // --- AUTH routes (publicas) ---
-    @PostMapping("/api/auth/register")
+  @PostMapping("/api/auth/register")
 public ResponseEntity<?> register(@RequestBody Map<String,Object> body) {
     try {
-        System.out.println("Intentando llamar a: " + authUrl + "/api/auth/register"); // <-- Agregamos este log
-        
+        System.out.println("Intentando llamar a: " + authUrl + "/api/auth/register");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return restTemplate.postForEntity(authUrl + "/api/auth/register", new HttpEntity<>(body, headers), Object.class);
-
+        return restTemplate.postForEntity(
+            authUrl + "/api/auth/register",
+            new HttpEntity<>(body, headers),
+            Object.class
+        );
     } catch (HttpClientErrorException e) {
-        return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
+        return ResponseEntity
+            .status(e.getStatusCode())
+            .body(e.getResponseBodyAsString());
+    } catch (HttpServerErrorException e) {
+        return ResponseEntity
+            .status(e.getStatusCode())
+            .body(e.getResponseBodyAsString());
     } catch (Exception e) {
         System.out.println("ERROR FATAL EN GATEWAY: " + e.getMessage());
-        e.printStackTrace(); // Esto fuerza que el error completo salga en los logs de Render
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body(Map.of("error_interno_gateway", e.getMessage()));
+        e.printStackTrace();
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("error_interno_gateway", e.getMessage()));
     }
 }
-
-    @PostMapping("/api/auth/login")
-    public ResponseEntity<?> login(@RequestBody Map<String,Object> body) {
-        try{
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            return restTemplate.postForEntity(
-                authUrl + "/api/auth/login", new HttpEntity<>(body, headers),
-                Object.class
-            );
-
-        }catch (HttpClientErrorException e){
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
-        }
+   @PostMapping("/api/auth/login")
+public ResponseEntity<?> login(@RequestBody Map<String,Object> body) {
+    try {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return restTemplate.postForEntity(
+            authUrl + "/api/auth/login",
+            new HttpEntity<>(body, headers),
+            Object.class
+        );
+    } catch (HttpClientErrorException e) {
+        return ResponseEntity
+            .status(e.getStatusCode())
+            .body(e.getResponseBodyAsString());
+    } catch (HttpServerErrorException e) {
+        return ResponseEntity
+            .status(e.getStatusCode())
+            .body(e.getResponseBodyAsString());
+    } catch (Exception e) {
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("error", e.getMessage()));
     }
-
-    // --- USER routes (protegidas, JwtFilter ya valido el token) ---
+}
     @GetMapping("/api/users/profile")
     public ResponseEntity<?> getProfile(HttpServletRequest req) {
         try{
